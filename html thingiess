@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Device Information</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .info {
+            margin: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="info">
+        <h2>Device Information</h2>
+        <p><strong>Operating System:</strong> <span id="os"></span></p>
+        <p><strong>Browser:</strong> <span id="browser"></span></p>
+        <p><strong>Screen Resolution:</strong> <span id="resolution"></span></p>
+        <button onclick="sendToDiscord()">Send to Discord</button>
+    </div>
+
+    <script>
+        function getOS() {
+            let userAgent = window.navigator.userAgent,
+                platform = window.navigator?.userAgentData?.platform || window.navigator.platform,
+                macosPlatforms = ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K'],
+                windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'],
+                iosPlatforms = ['iPhone', 'iPad', 'iPod'],
+                os = null;
+
+            if (macosPlatforms.indexOf(platform) !== -1) {
+                os = 'Mac OS';
+            } else if (iosPlatforms.indexOf(platform) !== -1) {
+                os = 'iOS';
+            } else if (windowsPlatforms.indexOf(platform) !== -1) {
+                os = 'Windows';
+            } else if (/Android/.test(userAgent)) {
+                os = 'Android';
+            } else if (/Linux/.test(platform)) {
+                os = 'Linux';
+            }
+
+            return os;
+        }
+
+        function getBrowser() {
+            let userAgent = navigator.userAgent;
+            let browserName;
+
+            if (userAgent.indexOf("Firefox") > -1) {
+                browserName = "Mozilla Firefox";
+            } else if (userAgent.indexOf("SamsungBrowser") > -1) {
+                browserName = "Samsung Internet";
+            } else if (userAgent.indexOf("Opera") > -1 || userAgent.indexOf("OPR") > -1) {
+                browserName = "Opera";
+            } else if (userAgent.indexOf("Trident") > -1) {
+                browserName = "Microsoft Internet Explorer";
+            } else if (userAgent.indexOf("Edge") > -1) {
+                browserName = "Microsoft Edge";
+            } else if (userAgent.indexOf("Chrome") > -1) {
+                browserName = "Google Chrome";
+            } else if (userAgent.indexOf("Safari") > -1) {
+                browserName = "Safari";
+            } else {
+                browserName = "Unknown";
+            }
+
+            return browserName;
+        }
+
+        function sendToDiscord() {
+            const os = getOS();
+            const browser = getBrowser();
+            const resolution = `${window.screen.width} x ${window.screen.height}`;
+            const webhookURL = 'https://discord.com/api/webhooks/1223294271940071464/9G6qAqw9k-RSv1Jrv4LXxyKndsKbCq9RawtYymjoAiZePXmZ1mNDsI6hS00QoX7kSghD';
+
+            const message = {
+                content: `Device Information:\n- Operating System: ${os}\n- Browser: ${browser}\n- Screen Resolution: ${resolution}`
+            };
+
+            fetch(webhookURL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(message)
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('Information sent to Discord successfully!');
+                    redirectToPage();
+                } else {
+                    alert('Failed to send information to Discord.');
+                }
+            })
+            .catch(error => {
+                console.error('Error sending to Discord:', error);
+                alert('An error occurred while sending information to Discord.');
+            });
+        }
+
+        function redirectToPage() {
+            window.location.href = 'https://www.example.com'; // Replace this URL with the URL you want to redirect to
+        }
+
+        document.getElementById('os').textContent = getOS();
+        document.getElementById('browser').textContent = getBrowser();
+        document.getElementById('resolution').textContent = `${window.screen.width} x ${window.screen.height}`;
+    </script>
+</body>
+</html>
